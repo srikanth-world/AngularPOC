@@ -1,0 +1,6 @@
+<div>
+    <h2>Welcome, {{authService.getRole()}}!</h2>
+    <button *ngIf="authService.isChecker()" (click)="submit()">Submit as Checker</button>
+    <button *ngIf="authService.isMaker()" (click)="approve()">Approve as Maker</button>
+  </div>
+  

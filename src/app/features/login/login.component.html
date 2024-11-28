@@ -1,0 +1,11 @@
+<div>
+  <h2>Login</h2>
+  <form (ngSubmit)="login()">
+    <label for="role">Role:</label>
+    <select id="role" [(ngModel)]="role" name="role" required>
+      <option value="checker">Checker</option>
+      <option value="maker">Maker</option>
+    </select>
+    <button type="submit">Login</button>
+  </form>
+</div>
