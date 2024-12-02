@@ -1,9 +1,7 @@
-To create a Single Page Application (SPA) where clicking on a side navigation menu item loads content dynamically within the same page, you can utilize Angular's component-based architecture along with structural directives. This approach ensures that different components are loaded dynamically into a designated area of the page without navigating away.
+You're right! Starting with Angular 13, the ComponentFactoryResolver has been deprecated because dynamic component creation can now be done directly using the component class. Here's how you can achieve the same functionality without ComponentFactoryResolver:
 
-Here's a step-by-step guide to achieve this:
-
-Step 1: Create a Placeholder for Dynamic Content
-Create a placeholder area within your main component where the dynamic content will be displayed.
+Updated Step-by-Step Guide
+Create a Placeholder for Dynamic Content: Use a <ng-container> with a structural directive to dynamically load components.
 
 home.component.html:
 
@@ -13,14 +11,16 @@ html
   <app-side-nav (menuSelect)="onMenuSelect($event)"></app-side-nav>
   <div class="content">
     <ng-container *ngIf="activeComponent">
-      <ng-template #componentHost></ng-template>
+      <ng-container #componentHost></ng-container>
     </ng-container>
   </div>
 </div>
+Update Home Component: Use the component class directly to load the dynamic component.
+
 home.component.ts:
 
 typescript
-import { Component, ComponentFactoryResolver, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
+import { Component, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
 import { HeaderComponent } from '../shared/components/header/header.component';
 import { SideNavComponent } from '../shared/components/side-nav/side-nav.component';
 import { CheckerComponent } from '../features/checker/checker.component';
@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
   @ViewChild('componentHost', { read: ViewContainerRef }) componentHost!: ViewContainerRef;
   activeComponent: any;
 
-  constructor(private componentFactoryResolver: ComponentFactoryResolver) {}
+  constructor() {}
 
   ngOnInit() {
     // Load initial component if necessary
@@ -49,69 +49,28 @@ export class HomeComponent implements OnInit {
 
   loadComponent(menuItem: string) {
     this.componentHost.clear();
-    let componentFactory;
+    let componentClass;
 
     switch (menuItem) {
       case 'checker':
-        componentFactory = this.componentFactoryResolver.resolveComponentFactory(CheckerComponent);
+        componentClass = CheckerComponent;
         break;
       case 'maker':
-        componentFactory = this.componentFactoryResolver.resolveComponentFactory(MakerComponent);
+        componentClass = MakerComponent;
         break;
       // Add cases for other components as needed
     }
 
-    if (componentFactory) {
-      this.activeComponent = this.componentHost.createComponent(componentFactory).instance;
+    if (componentClass) {
+      this.componentHost.createComponent(componentClass);
     }
   }
 }
-Step 2: Update Side Navigation to Emit Menu Selection Event
-Modify your SideNavComponent to emit an event when a menu item is clicked.
-
-side-nav.component.ts:
-
-typescript
-import { Component, EventEmitter, Output } from '@angular/core';
-import { AuthService } from '../../services/auth.service';
-
-@Component({
-  selector: 'app-side-nav',
-  standalone: true,
-  templateUrl: './side-nav.component.html',
-  styleUrls: ['./side-nav.component.css']
-})
-export class SideNavComponent {
-  @Output() menuSelect = new EventEmitter<string>();
-
-  constructor(public authService: AuthService) {}
-
-  selectMenuItem(menuItem: string) {
-    this.menuSelect.emit(menuItem);
-  }
-}
-side-nav.component.html:
-
-html
-<nav>
-  <ul>
-    <li (click)="selectMenuItem('home')">Home</li>
-    <li *ngIf="authService.isChecker()" (click)="selectMenuItem('checker')">Checker Menu Item</li>
-    <li *ngIf="authService.isMaker()" (click)="selectMenuItem('maker')">Maker Menu Item</li>
-    <li *ngIf="authService.isGuest()" (click)="selectMenuItem('guest')">Guest Menu Item</li>
-    <li (click)="selectMenuItem('settings')">Settings</li>
-  </ul>
-</nav>
-Step 3: Ensure Components are Standalone and Importable
-Make sure the components you want to load dynamically are standalone or properly imported into the main module.
-
 Summary
-home.component.html: Defines a placeholder for dynamic content with a <ng-template>.
+home.component.html: Defines a placeholder for dynamic content with a <ng-container>.
 
-home.component.ts: Uses ComponentFactoryResolver to dynamically load components.
+home.component.ts: Uses the component class directly to load components dynamically.
 
 side-nav.component.ts: Emits events based on menu item selection.
 
-side-nav.component.html: Links menu items to the selection event.
-
-This setup will allow you to click on menu items in the side navigation and dynamically load the corresponding component in the main content area without navigating away from the page. Let me know if you need further assistance or have more questions!
+This approach should work seamlessly with Angular 18 and newer versions. Let me know if you need further assistance or have more questions!
