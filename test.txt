@@ -1,76 +1,43 @@
-You're right! Starting with Angular 13, the ComponentFactoryResolver has been deprecated because dynamic component creation can now be done directly using the component class. Here's how you can achieve the same functionality without ComponentFactoryResolver:
-
-Updated Step-by-Step Guide
-Create a Placeholder for Dynamic Content: Use a <ng-container> with a structural directive to dynamically load components.
-
-home.component.html:
-
-html
-<app-header></app-header>
-<div class="main-container">
-  <app-side-nav (menuSelect)="onMenuSelect($event)"></app-side-nav>
-  <div class="content">
-    <ng-container *ngIf="activeComponent">
-      <ng-container #componentHost></ng-container>
-    </ng-container>
+<div class="home-container">
+  <header>
+    </header>
+  <div class="main-content">
+    <aside class="side-nav">
+      </aside>
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
   </div>
+  <footer>
+    </footer>
 </div>
-Update Home Component: Use the component class directly to load the dynamic component.
 
-home.component.ts:
 
-typescript
-import { Component, ViewChild, ViewContainerRef, OnInit } from '@angular/core';
-import { HeaderComponent } from '../shared/components/header/header.component';
-import { SideNavComponent } from '../shared/components/side-nav/side-nav.component';
-import { CheckerComponent } from '../features/checker/checker.component';
-import { MakerComponent } from '../features/maker/maker.component';
 
-@Component({
-  selector: 'app-home',
-  standalone: true,
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
-  imports: [HeaderComponent, SideNavComponent]
-})
-export class HomeComponent implements OnInit {
-  @ViewChild('componentHost', { read: ViewContainerRef }) componentHost!: ViewContainerRef;
-  activeComponent: any;
 
-  constructor() {}
-
-  ngOnInit() {
-    // Load initial component if necessary
-  }
-
-  onMenuSelect(menuItem: string) {
-    this.loadComponent(menuItem);
-  }
-
-  loadComponent(menuItem: string) {
-    this.componentHost.clear();
-    let componentClass;
-
-    switch (menuItem) {
-      case 'checker':
-        componentClass = CheckerComponent;
-        break;
-      case 'maker':
-        componentClass = MakerComponent;
-        break;
-      // Add cases for other components as needed
-    }
-
-    if (componentClass) {
-      this.componentHost.createComponent(componentClass);
-    }
-  }
+.home-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
-Summary
-home.component.html: Defines a placeholder for dynamic content with a <ng-container>.
 
-home.component.ts: Uses the component class directly to load components dynamically.
+header, footer {
+  background-color: #f0f0f0;
+  padding: 20px;
+}
 
-side-nav.component.ts: Emits events based on menu item selection.
+.main-content {
+  flex-grow: 1;
+  display: flex;
+}
 
-This approach should work seamlessly with Angular 18 and newer versions. Let me know if you need further assistance or have more questions!
+.side-nav {
+  width: 200px;
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 20px;
+}
