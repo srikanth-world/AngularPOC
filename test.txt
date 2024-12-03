@@ -1,23 +1,10 @@
-.home-container {
-  display: flex;
-  min-height: 100vh;
-}
-
-.side-nav {
-  width: 200px; /* Adjust the width as needed */
-  background-color: #f0f0f0;
-  padding: 20px;
-}
-
-.content {
-  flex-grow: 1;
-  padding: 20px;
-}
-
-
-<div class="home-container">
-  <app-side-nav></app-side-nav>
-  <div class="content">
-    <router-outlet></router-outlet>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-3 col-lg-2">
+      <app-side-nav></app-side-nav>
+    </div>
+    <div class="col-md-9 col-lg-10">
+      <router-outlet></router-outlet>
+    </div>
   </div>
 </div>
