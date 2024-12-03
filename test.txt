@@ -1,39 +1,11 @@
-<div class="home-container">
-  <header>
-    </header>
-  <div class="main-content">
-    <aside class="side-nav">
-      </aside>
-    <div class="content">
-      <router-outlet></router-outlet>
-    </div>
-  </div>
-  <footer>
-    </footer>
-</div>
-
-
-
-
 .home-container {
   display: flex;
-  flex-direction: column;
   min-height: 100vh;
 }
 
-header, footer {
-  background-color: #f0f0f0;
-  padding: 20px;
-}
-
-.main-content {
-  flex-grow: 1;
-  display: flex;
-}
-
 .side-nav {
-  width: 200px;
-  background-color: #f5f5f5;
+  width: 200px; /* Adjust the width as needed */
+  background-color: #f0f0f0;
   padding: 20px;
 }
 
@@ -41,3 +13,11 @@ header, footer {
   flex-grow: 1;
   padding: 20px;
 }
+
+
+<div class="home-container">
+  <app-side-nav></app-side-nav>
+  <div class="content">
+    <router-outlet></router-outlet>
+  </div>
+</div>
