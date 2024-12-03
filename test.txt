@@ -1,10 +1,188 @@
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-3 col-lg-2">
-      <app-side-nav></app-side-nav>
-    </div>
-    <div class="col-md-9 col-lg-10">
-      <router-outlet></router-outlet>
-    </div>
+Absolutely! You can definitely set up your routes in a separate app.routes.ts file to keep your routing configuration modular and organized. This approach is quite common and helps maintain a clean project structure.
+
+Step-by-Step Guide to Setup Routes in app.routes.ts
+Create app.routes.ts: Define your routes in a separate file, app.routes.ts.
+
+app.routes.ts:
+
+typescript
+import { Routes } from '@angular/router';
+import { HomeComponent } from './features/home/home.component';
+import { CheckerComponent } from './features/checker/checker.component';
+import { MakerComponent } from './features/maker/maker.component';
+import { RoleGuard } from './core/guards/role.guard';
+
+export const appRoutes: Routes = [
+  {
+    path: 'home',
+    component: HomeComponent,
+    canActivate: [RoleGuard],
+    children: [
+      { path: 'checker', component: CheckerComponent },
+      { path: 'maker', component: MakerComponent }
+      // Add more child routes as needed
+    ]
+  },
+  { path: '', redirectTo: '/home', pathMatch: 'full' }
+];
+Import Routes in main.ts: Import the appRoutes and set up the router configuration.
+
+main.ts:
+
+typescript
+import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
+import { importProvidersFrom } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { AppComponent } from './app/app.component';
+import { appRoutes } from './app.routes';
+import { RoleGuard } from './core/guards/role.guard';
+import { AuthService } from './core/services/auth.service';
+import { appConfig } from './app/app.config';
+
+bootstrapApplication(AppComponent, {
+  ...appConfig,
+  providers: [
+    provideRouter(appRoutes),
+    provideHttpClient(),
+    importProvidersFrom(RoleGuard, AuthService)
+  ]
+});
+Create HeaderComponent: Use Angular Material's mat-toolbar for the header.
+
+header.component.ts:
+
+typescript
+import { Component } from '@angular/core';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { AuthService } from '../../services/auth.service';
+
+@Component({
+  selector: 'app-header',
+  standalone: true,
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css'],
+  imports: [MatToolbarModule]
+})
+export class HeaderComponent {
+  constructor(public authService: AuthService) {}
+
+  logout() {
+    console.log('User logged out');
+  }
+}
+header.component.html:
+
+html
+<mat-toolbar color="primary">
+  <span>Application Title</span>
+  <span class="spacer"></span>
+  <span>Welcome, {{ authService.getUsername() }}!</span>
+  <button mat-button (click)="logout()">Logout</button>
+</mat-toolbar>
+header.component.css:
+
+css
+.spacer {
+  flex: 1 1 auto;
+}
+Create SideNavComponent: Use Angular Material's mat-sidenav and mat-list for the side navigation.
+
+side-nav.component.ts:
+
+typescript
+import { Component } from '@angular/core';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+
+@Component({
+  selector: 'app-side-nav',
+  standalone: true,
+  templateUrl: './side-nav.component.html',
+  styleUrls: ['./side-nav.component.css'],
+  imports: [MatSidenavModule, MatListModule, RouterModule]
+})
+export class SideNavComponent {
+  constructor(public authService: AuthService) {}
+}
+side-nav.component.html:
+
+html
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav mode="side" opened>
+    <mat-nav-list>
+      <mat-list-item routerLink="/home">Home</mat-list-item>
+      <mat-list-item *ngIf="authService.isChecker()" routerLink="/home/checker">Checker Menu Item</mat-list-item>
+      <mat-list-item *ngIf="authService.isMaker()" routerLink="/home/maker">Maker Menu Item</mat-list-item>
+      <mat-list-item *ngIf="authService.isGuest()" routerLink="/home/guest">Guest Menu Item</mat-list-item>
+      <mat-list-item routerLink="/home/settings">Settings</mat-list-item>
+    </mat-nav-list>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
+side-nav.component.css:
+
+css
+.sidenav-container {
+  height: 100%;
+}
+
+mat-sidenav {
+  width: 250px;
+}
+Create HomeComponent with Router Outlet: Use a <router-outlet> to load the child routes.
+
+home.component.ts:
+
+typescript
+import { Component } from '@angular/core';
+import { HeaderComponent } from '../shared/components/header/header.component';
+import { SideNavComponent } from '../shared/components/side-nav/side-nav.component';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css'],
+  imports: [HeaderComponent, SideNavComponent]
+})
+export class HomeComponent {}
+home.component.html:
+
+html
+<app-header></app-header>
+<div class="main-container">
+  <app-side-nav></app-side-nav>
+  <div class="content">
+    <router-outlet></router-outlet>
   </div>
 </div>
+home.component.css:
+
+css
+.main-container {
+  display: flex;
+  height: 100vh;
+}
+
+mat-sidenav-content {
+  flex: 1;
+  padding: 1rem;
+}
+Summary
+app.routes.ts: Define routes in a separate file for better organization.
+
+main.ts: Import routes from app.routes.ts and set up the router configuration.
+
+HeaderComponent: Use mat-toolbar for the header.
+
+SideNavComponent: Use mat-sidenav and mat-list for the side navigation with routerLink for navigation.
+
+HomeComponent: Include a <router-outlet> to load child components dynamically.
+
+By following these steps, you'll have a clean and modular setup using Angular Material with routes defined in app.routes.ts, dynamically loading components in the main content area based on side navigation menu selections. Let me know if you encounter any issues or need further assistance!
+
