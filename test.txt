@@ -1,64 +1,3 @@
-Step-by-Step Integration
-AppComponent: Ensuring this has the router-outlet for initial navigation.
-
-app.component.ts:
-
-typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
-})
-export class AppComponent {}
-app.component.html:
-
-html
-<router-outlet></router-outlet>
-HomeComponent: Integrate the Bootstrap layout.
-
-home.component.ts:
-
-typescript
-import { Component } from '@angular/core';
-
-@Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
-})
-export class HomeComponent {}
-home.component.html:
-
-html
-<app-header></app-header>
-<div class="container-fluid">
-  <div class="row flex-nowrap">
-    <nav class="col-auto col-md-3 col-lg-2 d-md-block bg-light sidenav">
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" routerLink="/home">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/home/checker">Checker</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/home/maker">Maker</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/home/settings">Settings</a>
-        </li>
-      </ul>
-    </nav>
-    <main class="col px-0 content">
-      <router-outlet></router-outlet>
-    </main>
-  </div>
-</div>
-home.component.css:
-
-css
 .main-container {
   display: flex;
   height: calc(100vh - 56px); /* Adjust height based on header height */
@@ -70,72 +9,21 @@ css
   height: 100%;
 }
 
-.content {
+.content-wrapper {
   flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 20px;
-  overflow-y: auto;
   background-color: #e9ecef;
+  overflow-y: auto;
 }
 
-header {
-  background-color: #343a40;
-  color: white;
-  padding: 10px;
-  text-align: center;
+.content-box {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  width: 100%;
 }
-
-.nav-link {
-  color: #343a40;
-}
-
-.nav-link:hover {
-  background-color: #343a40;
-  color: white;
-}
-Routing Configuration
-app.routes.ts:
-
-typescript
-import { Routes } from '@angular/router';
-import { HomeComponent } from './features/home/home.component';
-import { CheckerComponent } from './features/checker/checker.component';
-import { MakerComponent } from './features/maker/maker.component';
-import { LoginComponent } from './features/login/login.component';
-
-export const appRoutes: Routes = [
-  { path: 'login', component: LoginComponent },
-  {
-    path: 'home',
-    component: HomeComponent,
-    children: [
-      { path: 'checker', component: CheckerComponent },
-      { path: 'maker', component: MakerComponent }
-      // Add more child routes as needed
-    ]
-  },
-  { path: '', redirectTo: '/login', pathMatch: 'full' }
-];
-main.ts:
-
-typescript
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
-import { importProvidersFrom } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
-import { AppComponent } from './app/app.component';
-import { appRoutes } from './app.routes';  // Import the routes correctly
-
-bootstrapApplication(AppComponent, {
-  providers: [
-    provideRouter(appRoutes),  // Use the imported routes here
-    provideHttpClient()
-  ]
-});
-Summary
-AppComponent: Contains the main router-outlet for navigating between login and home.
-
-HomeComponent: Contains the header, sidenav, and another router-outlet for dynamic content with the Bootstrap layout.
-
-CSS: Utilizes Bootstrap's grid system to ensure the sidenav and content are displayed side-by-side responsively.
-
-By ensuring these steps, the content should load to the right of the side navigation when a menu item is clicked. Let me know if you need any further assistance or have more questions3
