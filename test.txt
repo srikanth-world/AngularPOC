@@ -1,188 +1,120 @@
-Absolutely! You can definitely set up your routes in a separate app.routes.ts file to keep your routing configuration modular and organized. This approach is quite common and helps maintain a clean project structure.
+Absolutely! Bootstrap 5 has built-in classes that make it easy to create responsive layouts using its grid system. You don't need to use tables for layout purposes. Instead, you can use Bootstrap's container, row, and col classes to achieve a responsive design.
 
-Step-by-Step Guide to Setup Routes in app.routes.ts
-Create app.routes.ts: Define your routes in a separate file, app.routes.ts.
-
-app.routes.ts:
-
-typescript
-import { Routes } from '@angular/router';
-import { HomeComponent } from './features/home/home.component';
-import { CheckerComponent } from './features/checker/checker.component';
-import { MakerComponent } from './features/maker/maker.component';
-import { RoleGuard } from './core/guards/role.guard';
-
-export const appRoutes: Routes = [
-  {
-    path: 'home',
-    component: HomeComponent,
-    canActivate: [RoleGuard],
-    children: [
-      { path: 'checker', component: CheckerComponent },
-      { path: 'maker', component: MakerComponent }
-      // Add more child routes as needed
-    ]
-  },
-  { path: '', redirectTo: '/home', pathMatch: 'full' }
-];
-Import Routes in main.ts: Import the appRoutes and set up the router configuration.
-
-main.ts:
-
-typescript
-import { bootstrapApplication } from '@angular/platform-browser';
-import { provideRouter } from '@angular/router';
-import { importProvidersFrom } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
-import { AppComponent } from './app/app.component';
-import { appRoutes } from './app.routes';
-import { RoleGuard } from './core/guards/role.guard';
-import { AuthService } from './core/services/auth.service';
-import { appConfig } from './app/app.config';
-
-bootstrapApplication(AppComponent, {
-  ...appConfig,
-  providers: [
-    provideRouter(appRoutes),
-    provideHttpClient(),
-    importProvidersFrom(RoleGuard, AuthService)
-  ]
-});
-Create HeaderComponent: Use Angular Material's mat-toolbar for the header.
-
-header.component.ts:
-
-typescript
-import { Component } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { AuthService } from '../../services/auth.service';
-
-@Component({
-  selector: 'app-header',
-  standalone: true,
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css'],
-  imports: [MatToolbarModule]
-})
-export class HeaderComponent {
-  constructor(public authService: AuthService) {}
-
-  logout() {
-    console.log('User logged out');
-  }
-}
-header.component.html:
-
+Step-by-Step Guide to Create a Responsive Layout
+1. Basic HTML Structure
 html
-<mat-toolbar color="primary">
-  <span>Application Title</span>
-  <span class="spacer"></span>
-  <span>Welcome, {{ authService.getUsername() }}!</span>
-  <button mat-button (click)="logout()">Logout</button>
-</mat-toolbar>
-header.component.css:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive SPA Layout with Bootstrap 5</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .main-container {
+            display: flex;
+            height: calc(100vh - 56px); /* Adjust height based on header height */
+        }
 
-css
-.spacer {
-  flex: 1 1 auto;
-}
-Create SideNavComponent: Use Angular Material's mat-sidenav and mat-list for the side navigation.
+        .sidenav {
+            flex: 0 0 250px;
+            background-color: #f8f9fa;
+            height: 100%;
+        }
 
-side-nav.component.ts:
+        .content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #e9ecef;
+        }
 
-typescript
-import { Component } from '@angular/core';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { RouterModule } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+        header {
+            background-color: #343a40;
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
 
-@Component({
-  selector: 'app-side-nav',
-  standalone: true,
-  templateUrl: './side-nav.component.html',
-  styleUrls: ['./side-nav.component.css'],
-  imports: [MatSidenavModule, MatListModule, RouterModule]
-})
-export class SideNavComponent {
-  constructor(public authService: AuthService) {}
-}
-side-nav.component.html:
+        .nav-link {
+            color: #343a40;
+        }
 
-html
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav mode="side" opened>
-    <mat-nav-list>
-      <mat-list-item routerLink="/home">Home</mat-list-item>
-      <mat-list-item *ngIf="authService.isChecker()" routerLink="/home/checker">Checker Menu Item</mat-list-item>
-      <mat-list-item *ngIf="authService.isMaker()" routerLink="/home/maker">Maker Menu Item</mat-list-item>
-      <mat-list-item *ngIf="authService.isGuest()" routerLink="/home/guest">Guest Menu Item</mat-list-item>
-      <mat-list-item routerLink="/home/settings">Settings</mat-list-item>
-    </mat-nav-list>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <router-outlet></router-outlet>
-  </mat-sidenav-content>
-</mat-sidenav-container>
-side-nav.component.css:
+        .nav-link:hover {
+            background-color: #343a40;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Application Title</h1>
+    </header>
+    <div class="container-fluid">
+        <div class="row flex-nowrap">
+            <nav class="col-auto col-md-3 col-lg-2 d-md-block bg-light sidenav">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#home" onclick="loadContent('home')">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#checker" onclick="loadContent('checker')">Checker</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#maker" onclick="loadContent('maker')">Maker</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#settings" onclick="loadContent('settings')">Settings</a>
+                    </li>
+                </ul>
+            </nav>
+            <main class="col px-0 content">
+                <div id="content">
+                    <h2>Welcome</h2>
+                    <p>Select a menu item to load content here.</p>
+                </div>
+            </main>
+        </div>
+    </div>
 
-css
-.sidenav-container {
-  height: 100%;
-}
+    <script>
+        function loadContent(page) {
+            const content = document.getElementById('content');
+            switch(page) {
+                case 'home':
+                    content.innerHTML = '<h2>Home</h2><p>Welcome to the Home page!</p>';
+                    break;
+                case 'checker':
+                    content.innerHTML = '<h2>Checker</h2><p>Welcome to the Checker page!</p>';
+                    break;
+                case 'maker':
+                    content.innerHTML = '<h2>Maker</h2><p>Welcome to the Maker page!</p>';
+                    break;
+                case 'settings':
+                    content.innerHTML = '<h2>Settings</h2><p>Welcome to the Settings page!</p>';
+                    break;
+                default:
+                    content.innerHTML = '<h2>Welcome</h2><p>Select a menu item to load content here.</p>';
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
+Explanation
+Container Fluid: container-fluid class is used for a full-width container.
 
-mat-sidenav {
-  width: 250px;
-}
-Create HomeComponent with Router Outlet: Use a <router-outlet> to load the child routes.
+Row Flex-nowrap: row flex-nowrap ensures the row content does not wrap and maintains side navigation and content side-by-side.
 
-home.component.ts:
+Columns:
 
-typescript
-import { Component } from '@angular/core';
-import { HeaderComponent } from '../shared/components/header/header.component';
-import { SideNavComponent } from '../shared/components/side-nav/side-nav.component';
+col-auto col-md-3 col-lg-2 d-md-block bg-light sidenav: This column adjusts the width based on the screen size.
 
-@Component({
-  selector: 'app-home',
-  standalone: true,
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css'],
-  imports: [HeaderComponent, SideNavComponent]
-})
-export class HomeComponent {}
-home.component.html:
+col px-0 content: This column takes the remaining space for the content.
 
-html
-<app-header></app-header>
-<div class="main-container">
-  <app-side-nav></app-side-nav>
-  <div class="content">
-    <router-outlet></router-outlet>
-  </div>
-</div>
-home.component.css:
-
-css
-.main-container {
-  display: flex;
-  height: 100vh;
-}
-
-mat-sidenav-content {
-  flex: 1;
-  padding: 1rem;
-}
 Summary
-app.routes.ts: Define routes in a separate file for better organization.
+Using Bootstrap 5's grid system, you can easily create a responsive layout with a header at the top, a side navigation on the left, and content on the right. The example provided sets up a basic structure that adjusts based on screen size, ensuring a responsive design.
 
-main.ts: Import routes from app.routes.ts and set up the router configuration.
-
-HeaderComponent: Use mat-toolbar for the header.
-
-SideNavComponent: Use mat-sidenav and mat-list for the side navigation with routerLink for navigation.
-
-HomeComponent: Include a <router-outlet> to load child components dynamically.
-
-By following these steps, you'll have a clean and modular setup using Angular Material with routes defined in app.routes.ts, dynamically loading components in the main content area based on side navigation menu selections. Let me know if you encounter any issues or need further assistance!
+Let me know if you need further customization or have any other questions!
 
